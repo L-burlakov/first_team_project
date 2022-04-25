@@ -5,7 +5,7 @@ from classes import*
 
 def print_initial_message():
     print('''
-        Hello! I\'m your virtual assistant. Some words about how I can assist you:
+        Hello! I"m your virtual assistant. Some words about how I can assist you:
         ''')
 
 

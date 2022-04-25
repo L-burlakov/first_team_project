@@ -8,7 +8,7 @@ setup(
     license='MIT',
     packages=find_namespace_packages(),
     include_package_data=True,
-    # install_requires=['pyparsing'],
+    install_requires=['pyparsing'],
     entry_points={'console_scripts': [
         'v_assistant = first_team_project.main:main']}
 )
