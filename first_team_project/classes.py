@@ -1,10 +1,9 @@
+from exceptions import*
+from pyparsing import ParseResults
 import pickle
 from datetime import datetime
 from collections import UserDict
 from copy import deepcopy
-from pathlib import Path
-from pyparsing import*
-from exceptions import*
 
 
 # определяем базовую логику геттеров и сеттеров, которую потом можем переопределять в классах-наследниках
@@ -171,7 +170,6 @@ class Record:
     def change_birthday(self, new_birthday: Birthday):
         self.birthday = new_birthday
 
-    # @AttributeError (No birthday date is given!)
     def days_to_birthday(self):
         now = datetime.now().date()
         nearest_bd = datetime(
@@ -200,7 +198,7 @@ class AddressBook(UserDict):
         self.iter_index = 0
 
     # если запись с таким именем уже существует, не добавляем ее
-    def add_record(self, record):
+    def add_record(self, record: Record):
         key = record.name.value
         if key not in self.data:
             self.data[key] = record
@@ -210,10 +208,11 @@ class AddressBook(UserDict):
     def get_record(self, name: Name):
         return self.data[name.value]
 
-    def delete_record(self, name):
+    def delete_record(self, name: Name):
         del self.data[name.value]
 
-    # поиск записей на основании совпадений введенной строки с любыми из значений полей объекта записи, case insensitive
+    # поиск записей на основании совпадений введенной строки с любыми из значений полей объекта записи,
+    # case insensitive
     def search_records(self, string: str):
         list_of_records = []
 
@@ -246,25 +245,31 @@ class AddressBook(UserDict):
             restored = deepcopy(pickle.load(file))
             return restored
 
-    # определяем итератор, который быдет разбивать вывод словаря на несколько частей
+    # определяем итератор, который быдет разбивать вывод словаря на несколько частей;
+    # итератор можно использовать повторно
     def __next__(self):
         keys = list(self.data.keys())
         if self.iter_index <= len(self.data)-1:
             self.iter_index += 1
             return self.data[keys[self.iter_index-1]]
-        raise StopIteration
+        else:
+            self.iter_index = 0
+            raise StopIteration
 
     def __iter__(self):
         return self
 
     def iterator(self, n: int):
         list_of_data = []
-        for i in range(n):
+        for _ in range(n):
             try:
                 list_of_data.append(next(self))
             except StopIteration:
-                print('Data is over!')
-                break
+                if not list_of_data:
+                    list_of_data.append(next(self))
+                    continue
+                else:
+                    break
 
         return list_of_data
 

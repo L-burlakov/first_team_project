@@ -1,4 +1,5 @@
 from pyparsing import*
+from exceptions import EmailLengthException
 
 
 class Parser:
@@ -88,8 +89,7 @@ class Parser:
         checked_mail = email_parser.parseString(email).asList()[0]
 
         if len(checked_mail.local_part) > 64:
-            #raise EmailException
-            return checked_mail
+            raise EmailLengthException
         else:
             return checked_mail
 

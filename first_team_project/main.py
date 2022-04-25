@@ -1,14 +1,12 @@
 from interface import Interface
+from importlib.resources import path
 from classes import*
 
 
 def print_initial_message():
     print('''
-        Hello! I\'m your virtual assistant. Some words about how I can assist you:
+        Hello! I"m your virtual assistant. Some words about how I can assist you:
         ''')
-
-# @ParseError
-# @KeyError
 
 
 def main():
@@ -16,8 +14,9 @@ def main():
 
     print_initial_message()
 
+    exit_point = '.'
+
     while True:
-        exit_point = '.'
         input_string = input(
             'Enter command to create, search, change, show or delete record. Print "." to break: ')
 
@@ -32,6 +31,10 @@ def main():
 
         if first_order_function() == exit_point:
             break
+
+    # получаем путь к файлу, в который будем записывать состояние бота на момент завершения его работы
+    with path('first_team_project', 'objects_copy.bin') as filepath:
+        interface.book.save_to_file(filepath)
 
 
 if __name__ == '__main__':
