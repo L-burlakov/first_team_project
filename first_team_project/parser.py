@@ -1,13 +1,15 @@
 from pyparsing import*
+from decorators import errors_handler
 from exceptions import EmailLengthException
 
 
 class Parser:
     def __init__(self):
         self.first_order_commands = ['hello', 'good_bye', 'close', 'exit', 'add_record', 'get_record', 'search_records',
-                                     'change_record', 'show_records', 'records_with_birthday_soon', 'delete_record']
-        self.second_order_commands = ['add_phone_number', 'add_email', 'add_address', 'change_phone_number', 'change_email',
-                                      'change_address', 'change_birthday', 'delete_phone', 'delete_email']
+                                     'change_record', 'show_records', 'birthday_soon', 'delete_record']
+        self.second_order_commands = ['hello', 'good_bye', 'close', 'exit', 'add_phone', 'add_email', 'add_address',
+                                      'add_birthday', 'change_phone', 'change_email', 'change_address', 'change_birthday',
+                                      'delete_phone', 'delete_email']
 
     def commands_parser(self, string: str, commands: list):
         # delimiter may be any printable char including space and except alphas
@@ -46,18 +48,20 @@ class Parser:
         else:
             return dict_of_commands[sorted_keys[0]]
 
+    @errors_handler
     def handle_first_order_commands(self, input_string: str):
         return self.commands_parser(input_string, self.first_order_commands)
 
+    @errors_handler
     def handle_second_order_commands(self, input_string: str):
         return self.commands_parser(input_string, self.second_order_commands)
 
     def handle_phone_numbers(self, phone: str):
         symbols = '()- '
-        phone = Combine(Optional(Suppress('+')) +
-                        OneOrMore(Optional(Suppress(Word(symbols))) + Word(nums)))
+        phone_parser = Combine(Optional(
+            Suppress('+')) + ZeroOrMore(Optional(Suppress(Word(symbols))) + Word(nums)))
 
-        return phone.parseString(phone).asList()[0]
+        return phone_parser.parseString(phone).asList()[0]
 
     def handle_emails(self, email: str):
         # spaces are not allowed within the local part, only in a form of " "@example.com;
@@ -83,15 +87,15 @@ class Parser:
         domain = Combine(ZeroOrMore(OneOrMore(Word(alphanums) + Optional((Literal('-')) + Word(alphanums))) + dot_lit) +
                          Word(alphanums))('domain')
 
-        email_parser = Combine(
-            local_part + Literal('@') + domain + StringEnd())
+        email_parser = Optional(
+            Combine(local_part + Literal('@') + domain + StringEnd()))
 
-        checked_mail = email_parser.parseString(email).asList()[0]
+        checked_mail = email_parser.parseString(email)
 
         if len(checked_mail.local_part) > 64:
             raise EmailLengthException
         else:
-            return checked_mail
+            return checked_mail.asList()[0]
 
     def handle_addresses(self, address: str):
         delim = Word(',;.')
@@ -112,17 +116,17 @@ class Parser:
         return address_parser.parseString(address)
 
     def handle_dates(self, date: str):
-        delimiters = './\- '
+        delimiters = './\-'
         days_digits = ''.join([str(i) for i in range(1, 32)])
         months_digits = ''.join([str(i) for i in range(1, 13)])
 
-        delimiter_unit = Word(delimiters)
+        delimiter_unit = Word(delimiters) | White()
         days_unit = Word(days_digits)
         months_unit = Word(months_digits)
 
-        date_unit = ((Combine(Optional('0') + days_unit) + Suppress(delimiter_unit) +
-                      Combine(Optional('0') + months_unit) + Suppress(delimiter_unit) +
-                      Combine(Char(nums) * (1, 4))).setParseAction(lambda t: [int(i) for i in t.asList()]))
+        date_unit = (Optional(Combine(Optional('0') + days_unit) + Suppress(delimiter_unit) +
+                              Combine(Optional('0') + months_unit) + Suppress(delimiter_unit) +
+                              Combine(Char(nums) * (1, 4))).setParseAction(lambda t: [int(i) for i in t.asList() if i]))
 
         # form the list in reversed order so that it will be easy to create a datetime object
         list_of_date_units = date_unit.parseString(date).asList()[::-1]
