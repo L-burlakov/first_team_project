@@ -3,7 +3,6 @@ from pyparsing import ParseResults
 import pickle
 from datetime import datetime
 from collections import UserDict
-from copy import deepcopy
 
 
 # определяем базовую логику геттеров и сеттеров, которую потом можем переопределять в классах-наследниках
@@ -45,7 +44,7 @@ class Phone(Field):
         Field.value.fset(self, new_value)
 
     def __repr__(self):
-        return self.value
+        return self.value if self.value else 'None'
 
     def __str__(self):
         return self.__repr__()
@@ -61,7 +60,7 @@ class Email(Field):
         Field.value.fset(self, new_value)
 
     def __repr__(self):
-        return self.value
+        return self.value if self.value else 'None'
 
     def __str__(self):
         return self.__repr__()
@@ -84,7 +83,7 @@ class Address(Field):
                     self.value.asDict().keys())[-1] != key else f'{key}: {val}'
             return representation_string
         else:
-            return None
+            return 'None'
 
     def __str__(self):
         return self.__repr__()
@@ -97,12 +96,12 @@ class Birthday(Field):
     # переопределяем сеттер родительского класса
     @Field.value.setter
     def value(self, new_value):
-        new_value = datetime(*new_value).date()
+        new_value = datetime(*new_value).date() if new_value else None
         # вызывем метод родительского класса через свойство fset аттрибута property
         Field.value.fset(self, new_value)
 
     def __repr__(self):
-        return self.value.strftime('%d %B %Y') if self.value else None
+        return self.value.strftime('%d %B %Y') if self.value else 'None'
 
     def __str__(self):
         return self.__repr__()
@@ -186,6 +185,8 @@ class Record:
     def __repr__(self):
         return (f'Name: {self.name.value}\n' +
                 f'Phones: {[phone.value for phone in self.phone_list]}\n' +
+                f'Emails: {[email.value for email in self.emails_list]}\n' +
+                f'Address: \n{self.address}\n' +
                 f'Birthday: {self.birthday}\n\n')
 
     def __str__(self):
@@ -242,7 +243,7 @@ class AddressBook(UserDict):
     # метод для десериализации; при восстановлении объекта создаем его глубокую копию
     def restore_from_file(self, filepath):
         with open(filepath, 'r+b') as file:
-            restored = deepcopy(pickle.load(file))
+            restored = pickle.load(file)
             return restored
 
     # определяем итератор, который быдет разбивать вывод словаря на несколько частей;
@@ -254,7 +255,7 @@ class AddressBook(UserDict):
             return self.data[keys[self.iter_index-1]]
         else:
             self.iter_index = 0
-            raise StopIteration
+        raise StopIteration
 
     def __iter__(self):
         return self
@@ -265,20 +266,13 @@ class AddressBook(UserDict):
             try:
                 list_of_data.append(next(self))
             except StopIteration:
-                if not list_of_data:
+                if not list_of_data and len(self.data) > 0:
                     list_of_data.append(next(self))
                     continue
                 else:
                     break
 
         return list_of_data
-
-    def __deepcopy__(self, memo):
-        copy_book = AddressBook()
-        memo[id(copy_book)] = copy_book
-        copy_book.data = deepcopy(self.data)
-        copy_book.iter_index = deepcopy(self.iter_index)
-        return copy_book
 
     def __repr__(self):
         string = f''
