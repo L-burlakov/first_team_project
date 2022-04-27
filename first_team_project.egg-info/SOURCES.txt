@@ -1,9 +1,12 @@
 MANIFEST.in
 README.md
-documentation.docx
+documentation_new.docx
 setup.py
+first_team_project/Notes.py
 first_team_project/__init__.py
+first_team_project/address_book_runner.py
 first_team_project/classes.py
+first_team_project/clean.py
 first_team_project/decorators.py
 first_team_project/exceptions.py
 first_team_project/interface.py
