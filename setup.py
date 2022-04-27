@@ -10,5 +10,5 @@ setup(
     include_package_data=True,
     install_requires=['pyparsing'],
     entry_points={'console_scripts': [
-        'v_assistant = first_team_project.wery_main:main']}
+        'v_assistant = first_team_project.main:main']}
 )

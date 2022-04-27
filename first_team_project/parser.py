@@ -116,7 +116,7 @@ class Parser:
         return address_parser.parseString(address)
 
     def handle_dates(self, date: str):
-        delimiters = './\-'
+        delimiters = '.,/\+-*|:;'
         days_digits = ''.join([str(i) for i in range(1, 32)])
         months_digits = ''.join([str(i) for i in range(1, 13)])
 

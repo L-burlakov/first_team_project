@@ -1,59 +1,28 @@
-from first_team_project.interface import Interface
-from first_team_project.classes import*
-from importlib.resources import path
+from first_team_project.address_book_runner import main_book
+from first_team_project.Notes import main_notes
+from first_team_project.clean import clean_folder
 
 
-def print_initial_message():
-    print('''
-        Hello! I"m your virtual assistant. Some words about how I can assist you:
-        1) I create a dictionary of records (contacts).
-        2) I create a notebook, where you can store, change, delete and search your notes. 
-        3) I accept set of commands, that allow to create, change, delete and show records in the address book.
-        4) I can sort all files in some given directory.\n
-        ''')
-
-
-def main_book():
-    interface = Interface()
-
-    print_initial_message()
-
-    # define exit symbol and exit semaphore
-    exit_point = '.'
-    exit_flag = False
-
+def main():
+    answ = ''
     while True:
-        print('''On this level I accept next commands: hello, good_bye, close, exit, add_record, get_record, search_records, 
-                 change_record, show_records, birthday_soon, delete_record\n''')
-
-        # serie of loops to fix the errors on place
-        while True:
-            input_string = input('''Enter command to create, search, change, show or delete record. 
-                                    Or enter one of exit commands to break: \n''')
-            first_order_command = interface.parser.handle_first_order_commands(
-                input_string)
-            first_order_function = interface.first_order_commands_handler(
-                first_order_command)
-
-            if first_order_function != None:
-                break
-        while True:
-            func = first_order_function()
-            if func == exit_point:
-                exit_flag = True
-                break
-            elif func != None:
-                break
-        if exit_flag:
+        answ = input('If U want to work with:\n***' + "\033[0m\033[44m {}" .format('Phone') +
+                     '\033[0m' + 'Book ***** ' + "\033[0m\033[44m {}" .format('Note') +
+                     '\033[0m' + 's ***** ' + "\033[0m\033[44m {}" .format('Clear') +
+                     '\033[0m' + ' Directory ***\n')
+        if answ == 'Phone':
+            main_book()
+        elif answ == 'Notes':
+            main_notes()
+        elif answ == 'Clear':
+            clean_folder()
+        elif answ == '.':
+            print('Good bye!')
             break
-
-    # получаем путь к файлу, в который будем записывать состояние бота на момент завершения его работы
-    with path('first_team_project', 'objects_copy.bin') as filepath:
-        interface.book.save_to_file(filepath)
-
-    print('Changes saved in objects_copy.bin!\n')
-    print('Good bye!\n')
+        else:
+            print('Please, make your choice. And try again.')
+            continue
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
