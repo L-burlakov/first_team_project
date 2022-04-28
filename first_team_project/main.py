@@ -9,7 +9,8 @@ def main():
         answ = input('If U want to work with:\n***' + "\033[0m\033[44m {}" .format('Phone') +
                      '\033[0m' + 'Book ***** ' + "\033[0m\033[44m {}" .format('Note') +
                      '\033[0m' + 's ***** ' + "\033[0m\033[44m {}" .format('Clear') +
-                     '\033[0m' + ' Directory ***\n')
+                     '\033[0m' + ' Directory *****' '\033[0m' +
+                     '\033[44m {}' .format('.') + '\033[0m' + ' - if U want to stop it \n')
         if answ == 'Phone':
             main_book()
         elif answ == 'Notes':
