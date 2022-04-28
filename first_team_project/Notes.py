@@ -41,10 +41,12 @@ class Record_Note:
         self.add_tag(*args)      
 
                 
-    def add_note(self, *args) -> None:                
-        for item in args:             
-                                
-            if isinstance (item, Note) and item.note != '' and item not in self.notes:      
+    def add_note(self, *args) -> None:
+        for item in args:
+            b=''
+            for i in self.notes:
+                b+= i.note
+            if isinstance (item, Note) and item.note != '' and item.note not in b:
                 #print (f'{self.subject}, {item.note}')
                 self.notes.append(item)
 
