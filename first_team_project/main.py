@@ -13,7 +13,7 @@ def main():
                      '\033[44m {}' .format('.') + '\033[0m' + ' - if U want to stop it \n')
         if answ == 'Phone':
             main_book()
-        elif answ == 'Notes':
+        elif answ == 'Note':
             main_notes()
         elif answ == 'Clear':
             clean_folder()
